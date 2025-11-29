@@ -1,5 +1,6 @@
-asgiref==3.11.0 ; python_version >= "3.12"
-django==5.2.8 ; python_version >= "3.12"
-mysqlclient==2.2.7 ; python_version >= "3.12"
-sqlparse==0.5.4 ; python_version >= "3.12"
-tzdata==2025.2 ; python_version >= "3.12" and sys_platform == "win32"
+asgiref==3.11.0
+dj-database-url==3.0.1
+Django==5.2.8
+mysqlclient==2.2.7
+psycopg2-binary==2.9.11
+sqlparse==0.5.4
