@@ -26,8 +26,11 @@ SECRET_KEY = 'django-insecure-#qny*#3f#ndc6o$9pnt3w_4cfmjbu_hlz*y7%vhy_(b+%0+2-z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "your-app-name.onrender.com",
+]
 
 # Application definition
 
@@ -142,7 +145,6 @@ LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = '/login/'
 
 # Message frame (used to display success/error messages)
-from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.DEBUG: 'debug',
     messages.INFO: 'info',
