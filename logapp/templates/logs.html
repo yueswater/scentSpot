@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12 max-w-6xl">
+  
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-base-content mb-2">
+      <i class="fa-solid fa-list mr-3"></i>Usage Logs
+    </h1>
+    <p class="text-base-content/70 text-lg">
+      Track and filter your perfume usage history
+    </p>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card bg-base-100 shadow-xl mb-8">
+    <div class="card-body">
+      <h2 class="card-title text-2xl mb-4">
+        <i class="fa-solid fa-filter mr-2"></i>Filters
+      </h2>
+      
+      <form method="GET" class="space-y-6">
+        
+        <!-- Date Filter -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-semibold text-lg">
+              <i class="fa-solid fa-calendar mr-2"></i>Date
+            </span>
+          </label>
+          <input 
+            type="date" 
+            name="date" 
+            value="{{ selected_date }}" 
+            class="input input-bordered w-full"
+          />
+        </div>
+
+        <!-- Perfume Filter -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-semibold text-lg">
+              <i class="fa-solid fa-spray-can mr-2"></i>Perfume
+            </span>
+          </label>
+          <select name="perfume" class="select select-bordered w-full">
+            <option value="all">-- All Perfumes --</option>
+            {% for p in perfumes %}
+              <option value="{{ p.id }}" {% if p.id|stringformat:"s" == selected_perfume %}selected{% endif %}>
+                {{ p.brand }} - {{ p.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Gender Filter -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-semibold text-lg">
+              <i class="fa-solid fa-venus-mars mr-2"></i>Gender
+            </span>
+          </label>
+          <select name="gender" class="select select-bordered w-full">
+            <option value="all">-- All Genders --</option>
+            <option value="M" {% if selected_gender == "M" %}selected{% endif %}>Male</option>
+            <option value="F" {% if selected_gender == "F" %}selected{% endif %}>Female</option>
+            <option value="U" {% if selected_gender == "U" %}selected{% endif %}>Unspecified</option>
+          </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4 pt-4">
+          <button type="submit" class="btn btn-primary flex-1">
+            <i class="fa-solid fa-check mr-2"></i>
+            Apply Filters
+          </button>
+          <a href="/logs/" class="btn btn-ghost flex-1">
+            <i class="fa-solid fa-rotate-right mr-2"></i>
+            Reset
+          </a>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Card -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-2xl mb-4">
+        <i class="fa-solid fa-clock-rotate-left mr-2"></i>Results
+      </h2>
+
+      {% if logs %}
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>Gender</th>
+                <th>Perfume</th>
+                <th>User</th>
+                <th>Date & Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+                <tr class="hover">
+                  <td>
+                    <div class="badge badge-outline">
+                      {{ log.get_gender_display }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="font-semibold">{{ log.perfume.brand }}</div>
+                    <div class="text-sm opacity-70">{{ log.perfume.name }}</div>
+                  </td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <i class="fa-solid fa-user text-primary"></i>
+                      <span>{{ log.user.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="text-sm">
+                      <i class="fa-solid fa-clock mr-1"></i>
+                      {{ log.used_at|date:"Y-m-d H:i" }}
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="mt-4 text-sm text-base-content/70">
+          <i class="fa-solid fa-chart-simple mr-2"></i>
+          Showing {{ logs|length }} log{{ logs|length|pluralize }}
+        </div>
+        
+      {% else %}
+        <div class="text-center py-12">
+          <i class="fa-solid fa-inbox text-6xl text-base-content/20 mb-4"></i>
+          <p class="text-xl text-base-content/70">No logs found.</p>
+          <p class="text-sm text-base-content/50 mt-2">Try adjusting your filters or start recording usage.</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="mt-8 text-center">
+    <a href="/" class="btn btn-ghost btn-lg">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Back to Home
+    </a>
+  </div>
+
+</div>
+{% endblock %}

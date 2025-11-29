@@ -1,0 +1,87 @@
+<!-- Edit Modal for perfume -->
+<dialog id="edit_modal_{{ perfume.id }}" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-4">
+      <i class="fa-solid fa-pen mr-2"></i>Edit Perfume
+    </h3>
+    <form method="POST" action="{% url 'edit_perfume' perfume.id %}">
+      {% csrf_token %}
+      
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">Brand</span>
+        </label>
+        <input type="text" name="brand" value="{{ perfume.brand }}" class="input input-bordered" required />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">Name</span>
+        </label>
+        <input type="text" name="name" value="{{ perfume.name }}" class="input input-bordered" required />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">Capacity (ml)</span>
+        </label>
+        <input type="number" name="capacity_ml" value="{{ perfume.capacity_ml }}" class="input input-bordered" required />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">Image URL (Optional)</span>
+        </label>
+        <input type="url" name="image_url" value="{{ perfume.image_url }}" class="input input-bordered" placeholder="https://example.com/perfume.jpg" />
+        {% if perfume.image_url %}
+          <label class="label">
+            <span class="label-text-alt">
+              <a href="{{ perfume.image_url }}" target="_blank" class="link link-primary">View current image</a>
+            </span>
+          </label>
+        {% endif %}
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">Description</span>
+        </label>
+        <textarea name="description" class="textarea textarea-bordered h-24">{{ perfume.description }}</textarea>
+      </div>
+
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('edit_modal_{{ perfume.id }}').close()">Cancel</button>
+        <button type="submit" 
+        class="btn btn-outline btn-primary gap-2 hover:!text-white">
+        <i class="fa-solid fa-check"></i>
+        <span class="leading-none">Save Changes</span>
+        </button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<!-- Delete Confirmation Modal -->
+<dialog id="delete_modal_{{ perfume.id }}" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error mb-4">
+      <i class="fa-solid fa-trash mr-2"></i>Delete Perfume
+    </h3>
+    <p class="mb-4">Are you sure you want to delete <strong>{{ perfume.brand }} - {{ perfume.name }}</strong>?</p>
+    <p class="text-sm opacity-70 mb-4">This action cannot be undone.</p>
+    
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost" onclick="document.getElementById('delete_modal_{{ perfume.id }}').close()">Cancel</button>
+      <form method="POST" action="{% url 'delete_perfume' perfume.id %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-error">Delete</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>

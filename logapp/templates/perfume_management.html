@@ -1,0 +1,378 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4 py-12 max-w-7xl">
+  <!-- Page Header -->
+  <div
+    class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+  >
+    <div>
+      <h1 class="text-4xl font-bold text-base-content mb-2">
+        <i class="fa-solid fa-spray-can mr-3"></i>Perfume Management
+      </h1>
+      <p class="text-base-content/70 text-lg">Manage your perfume collection</p>
+    </div>
+
+    <div class="flex gap-3 items-center">
+      <!-- View Toggle -->
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <span class="text-sm font-medium">Cards</span>
+          <input
+            type="checkbox"
+            id="view-toggle"
+            class="toggle toggle-primary"
+            onchange="toggleView(this)"
+          />
+          <span class="text-sm font-medium">Table</span>
+        </label>
+      </div>
+
+      <!-- Add Button -->
+      <button
+        onclick="add_modal.showModal()"
+        class="btn btn-outline btn-primary btn-sm gap-2 h-9 flex items-center hover:!text-white"
+        >
+        <i class="fa-solid fa-plus"></i>
+        <span class="leading-none">Add New</span>
+    </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  {% if messages %} {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} mb-6">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>{{ message }}</span>
+  </div>
+  {% endfor %} {% endif %}
+
+  <!-- Card View -->
+  <div
+    id="card-view"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+  >
+    {% for perfume in perfumes %}
+    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+      <!-- Perfume Image -->
+      {% if perfume.image_url %}
+      <figure class="px-4 pt-4">
+        <img src="{{ perfume.image_url }}" alt="{{ perfume.brand }} - {{
+        perfume.name }}" class="rounded-xl h-48 w-full object-cover"
+        onerror="this.src='https://placehold.co/400x300/e0e7ff/4f46e5?text={{
+        perfume.brand|slice:":1" }}'" />
+      </figure>
+      {% else %}
+      <figure class="px-4 pt-4">
+        <div
+          class="rounded-xl h-48 w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
+        >
+          <i class="fa-solid fa-spray-can text-6xl opacity-30"></i>
+        </div>
+      </figure>
+      {% endif %}
+
+      <div class="card-body">
+        <div class="flex justify-between items-start">
+          <h2 class="card-title text-xl">{{ perfume.brand }}</h2>
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </label>
+            <ul
+              tabindex="0"
+              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <a
+                  href="#"
+                  onclick="event.preventDefault(); document.getElementById('edit_modal_{{ perfume.id }}').showModal();"
+                >
+                  <i class="fa-solid fa-pen"></i> Edit
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="event.preventDefault(); document.getElementById('delete_modal_{{ perfume.id }}').showModal();"
+                  class="text-error"
+                >
+                  <i class="fa-solid fa-trash"></i> Delete
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="text-lg font-semibold opacity-80">{{ perfume.name }}</p>
+
+        <div class="badge badge-primary badge-outline">
+          <i class="fa-solid fa-flask mr-1"></i>
+          {{ perfume.capacity_ml }} ml
+        </div>
+
+        {% if perfume.description %}
+        <p class="text-sm opacity-70 mt-2 line-clamp-3">
+          {{ perfume.description }}
+        </p>
+        {% endif %}
+
+        <div class="card-actions justify-end mt-4">
+          <div class="text-xs opacity-50">
+            Added {{ perfume.created_at|date:"Y-m-d" }}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+      <i class="fa-solid fa-spray-can text-6xl text-base-content/20 mb-4"></i>
+      <p class="text-xl text-base-content/70">No perfumes yet.</p>
+      <p class="text-sm text-base-content/50 mt-2">
+        Click "Add New" to get started.
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Table View -->
+  <div id="table-view" class="hidden">
+    {% if perfumes %}
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Brand</th>
+            <th>Name</th>
+            <th>Capacity</th>
+            <th>Description</th>
+            <th>Added</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for perfume in perfumes %}
+          <tr class="hover">
+            <td class="align-middle">
+              {% if perfume.image_url %}
+              <div class="avatar">
+                <div class="w-12 h-12 rounded">
+                  <img
+                    src="{{ perfume.image_url }}"
+                    alt="{{ perfume.brand }}"
+                    onerror="this.parentElement.innerHTML='<div class=\'w-12 h-12 rounded bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center\'><i class=\'fa-solid fa-spray-can text-sm opacity-30\'></i></div>'"
+                  />
+                </div>
+              </div>
+              {% else %}
+              <div
+                class="w-12 h-12 rounded bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-spray-can text-sm opacity-30"></i>
+              </div>
+              {% endif %}
+            </td>
+            <td class="font-semibold align-middle">{{ perfume.brand }}</td>
+            <td class="align-middle">{{ perfume.name }}</td>
+            <td class="align-middle">
+              <div class="badge badge-primary badge-outline">
+                <i class="fa-solid fa-flask mr-1"></i>
+                {{ perfume.capacity_ml }} ml
+              </div>
+            </td>
+            <td class="align-middle">
+              {% if perfume.description %}
+              <div class="max-w-xs truncate text-sm opacity-70">
+                {{ perfume.description }}
+              </div>
+              {% else %}
+              <span class="text-sm opacity-50">—</span>
+              {% endif %}
+            </td>
+            <td class="text-sm opacity-70 align-middle">
+              {{ perfume.created_at|date:"Y-m-d" }}
+            </td>
+            <td class="text-right align-middle">
+              <div class="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onclick="document.getElementById('edit_modal_{{ perfume.id }}').showModal()"
+                  class="btn btn-sm btn-outline btn-primary hover:!text-white flex items-center gap-1 px-3 py-1"
+                >
+                  <i class="fa-solid fa-pen"></i>
+                  <span class="leading-none">Edit</span>
+                </button>
+                <button
+                  type="button"
+                  onclick="document.getElementById('delete_modal_{{ perfume.id }}').showModal()"
+                  class="btn btn-sm btn-outline btn-error hover:!text-white flex items-center gap-1 px-3 py-1"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                  <span class="leading-none">Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <i class="fa-solid fa-spray-can text-6xl text-base-content/20 mb-4"></i>
+      <p class="text-xl text-base-content/70">No perfumes yet.</p>
+      <p class="text-sm text-base-content/50 mt-2">
+        Click "Add New" to get started.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- All Modals (only once) -->
+{% for perfume in perfumes %} {% include "perfume_modals.html" with perfume=perfume %} {% endfor %}
+
+<!-- Add New Perfume Modal -->
+<dialog id="add_modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-4">
+      <i class="fa-solid fa-plus mr-2"></i>Add New Perfume
+    </h3>
+
+    <form method="POST" action="{% url 'add_perfume' %}">
+      {% csrf_token %}
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">
+            <i class="fa-solid fa-tag mr-1"></i>Brand
+          </span>
+        </label>
+        <input
+          type="text"
+          name="brand"
+          placeholder="e.g., Chanel, Dior, Jo Malone"
+          class="input input-bordered"
+          required
+        />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">
+            <i class="fa-solid fa-spray-can mr-1"></i>Name
+          </span>
+        </label>
+        <input
+          type="text"
+          name="name"
+          placeholder="e.g., No. 5, Sauvage, English Pear"
+          class="input input-bordered"
+          required
+        />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">
+            <i class="fa-solid fa-flask mr-1"></i>Capacity (ml)
+          </span>
+        </label>
+        <input
+          type="number"
+          name="capacity_ml"
+          placeholder="e.g., 50, 100"
+          class="input input-bordered"
+          min="1"
+          required
+        />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">
+            <i class="fa-solid fa-image mr-1"></i>Image URL (Optional)
+          </span>
+        </label>
+        <input
+          type="url"
+          name="image_url"
+          placeholder="https://example.com/perfume.jpg"
+          class="input input-bordered"
+        />
+        <label class="label">
+          <span class="label-text-alt"
+            >Enter a direct link to the perfume image</span
+          >
+        </label>
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">
+            <i class="fa-solid fa-align-left mr-1"></i>Description (Optional)
+          </span>
+        </label>
+        <textarea
+          name="description"
+          placeholder="Notes, scent profile, or any other details..."
+          class="textarea textarea-bordered h-24"
+        ></textarea>
+      </div>
+
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" onclick="add_modal.close()">
+          Cancel
+        </button>
+        <button type="submit" 
+                class="btn btn-outline btn-primary gap-2 hover:!text-white">
+        <i class="fa-solid fa-check"></i>
+        <span class="leading-none">Add Perfume</span>
+        </button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<!-- View Switch Script -->
+<script>
+  // Toggle view based on checkbox state
+  function toggleView(checkbox) {
+    const cardView = document.getElementById("card-view");
+    const tableView = document.getElementById("table-view");
+
+    if (checkbox.checked) {
+      // Show table view
+      cardView.classList.add("hidden");
+      tableView.classList.remove("hidden");
+      localStorage.setItem("perfumeView", "table");
+    } else {
+      // Show card view
+      cardView.classList.remove("hidden");
+      tableView.classList.add("hidden");
+      localStorage.setItem("perfumeView", "card");
+    }
+  }
+
+  // Load saved view preference on page load
+  document.addEventListener("DOMContentLoaded", function () {
+    const savedView = localStorage.getItem("perfumeView") || "card";
+    const toggle = document.getElementById("view-toggle");
+    const cardView = document.getElementById("card-view");
+    const tableView = document.getElementById("table-view");
+
+    if (savedView === "table") {
+      toggle.checked = true;
+      cardView.classList.add("hidden");
+      tableView.classList.remove("hidden");
+    } else {
+      toggle.checked = false;
+      cardView.classList.remove("hidden");
+      tableView.classList.add("hidden");
+    }
+  });
+</script>
+
+{% endblock %}

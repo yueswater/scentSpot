@@ -1,0 +1,18 @@
+[project]
+name = "scentspot"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Anthony Sung",email = "sungpinyue@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django (>=5.2.8,<6.0.0)",
+    "mysqlclient (>=2.2.7,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

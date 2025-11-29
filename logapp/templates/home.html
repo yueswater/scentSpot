@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block navbar %}
+  {% include "components/navbar.html" with navbar_style="transparent" %}
+{% endblock %}
+
+{% block content %}
+<div
+  class="hero min-h-screen"
+  style="background-image: url('{% static 'images/hero-bg.jpg' %}');"
+>
+  <div class="hero-overlay bg-opacity-40"></div>
+
+  <div class="hero-content text-neutral-content w-full">
+    <div class="max-w-7xl w-full px-8">
+      <div class="max-w-2xl">
+        <h1 class="mb-5 text-6xl font-extrabold drop-shadow-lg text-left">
+          Welcome to <br />ScentSpot
+        </h1>
+
+        <p class="mb-3 text-xl opacity-90 text-left">
+          Track your perfume journey effortlessly.
+        </p>
+
+        <p class="mb-8 text-base opacity-75 text-left max-w-lg">
+          Keep track of fragrance usage for you and your friends in the most fun and enjoyable way.
+        </p>
+
+        <div class="text-left">
+          <a href="/record/" class="btn btn-primary px-10 py-2 text-lg">
+            Start Recording
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

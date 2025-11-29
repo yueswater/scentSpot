@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block navbar %}
+  {% include "components/navbar.html" with navbar_style="transparent" %}
+{% endblock %}
+
+{% block content %}
+<div
+  class="hero min-h-screen"
+  style="background-image: url('{% static 'images/hero-bg.jpg' %}');"
+>
+  <div class="hero-overlay bg-opacity-60"></div>
+
+  <div class="hero-content w-full">
+    <div class="card w-full max-w-md bg-base-100 shadow-2xl">
+      <div class="card-body">
+        <h2 class="card-title text-3xl font-bold text-center justify-center mb-6">
+          <i class="fa-solid fa-right-to-bracket mr-2"></i>
+          Login to ScentSpot
+        </h2>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}">
+          {% csrf_token %}
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">
+                <i class="fa-solid fa-user mr-2"></i>Username
+              </span>
+            </label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Enter your username"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div class="form-control mt-4">
+            <label class="label">
+              <span class="label-text font-semibold">
+                <i class="fa-solid fa-lock mr-2"></i>Password
+              </span>
+            </label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div class="form-control mt-6">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-right-to-bracket mr-2"></i>
+              Login
+            </button>
+          </div>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <p class="text-center text-sm">
+          Don't have an account?
+          <a href="{% url 'register' %}" class="link link-primary font-semibold">
+            Sign up here
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Record Usage{% endblock %}
+
+{% block content %}
+
+<div class="w-full py-10">
+
+  <div class="max-w-3xl mx-auto px-4">
+
+    <h1 class="text-3xl font-bold mb-8">Record Perfume Usage</h1>
+
+    <div class="flex flex-col lg:flex-row gap-12">
+
+      <div class="flex-1">
+
+        <form method="POST" class="space-y-6">
+          {% csrf_token %}
+
+          <div>
+            <label class="label font-semibold">Gender</label>
+            <select name="gender" class="select select-bordered w-full">
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+              <option value="U">Unspecified</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label font-semibold">Perfume</label>
+            <select name="perfume" class="select select-bordered w-full">
+              {% for p in perfumes %}
+              <option value="{{ p.id }}">{{ p.brand }} - {{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="label font-semibold">Staff</label>
+            <select name="user" class="select select-bordered w-full">
+              {% for u in users %}
+              <option value="{{ u.id }}">{{ u.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button class="btn btn-primary w-full text-lg">Record</button>
+
+        </form>
+      </div>
+
+      <div class="flex-1 hidden lg:block">
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Today's Usage</title>
+  </head>
+  <body>
+    <h1>Usage Today — {{ today }}</h1>
+
+    <h2>Summary by Gender</h2>
+    <ul>
+      {% for row in count_gender %}
+      <li>{{ row.gender }} : {{ row.count }} times</li>
+      {% empty %}
+      <li>No data.</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Perfume Ranking</h2>
+    <ul>
+      {% for row in count_perfume %}
+      <li>
+        {{ row.perfume__brand }} - {{ row.perfume__name }} : {{ row.count }}
+        times
+      </li>
+      {% empty %}
+      <li>No data.</li>
+      {% endfor %}
+    </ul>
+
+    <h2>All Logs for Today</h2>
+    <ul>
+      {% for log in logs %}
+      <li>
+        [{{ log.get_gender_display }}] {{ log.perfume.brand }} - {{
+        log.perfume.name }} by {{ log.user.name }} at {{ log.used_at }}
+      </li>
+      {% empty %}
+      <li>No usage logs recorded today.</li>
+      {% endfor %}
+    </ul>
+
+    <p><a href="/">Back to Home</a></p>
+  </body>
+</html>
