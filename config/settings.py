@@ -72,13 +72,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # PostgreSQL database configuration using dj-database-url
-DATABASES = {
-    "default": dj_database_url.parse(
-        os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    # Production (Render)
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,
+        )
+    }
+else:
+    # Local development (MySQL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "scentspot",
+            "USER": "scentspot_user",
+            "PASSWORD": "scentSpot",
+            "HOST": "127.0.0.1",
+            "PORT": "3306",
+        }
+    }
 
 # Password validation settings
 AUTH_PASSWORD_VALIDATORS = [
