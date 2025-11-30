@@ -62,14 +62,20 @@ def register_view(request):
             messages.error(request, 'Email already registered.')
             return render(request, 'register.html')
         
-        #Create user (password will be hashed automatically)
+        # Create user (password will be hashed automatically)
         try:
-            user = AuthUser.objects.create_user(
+            auth_user = AuthUser.objects.create_user(
                 username=username,
                 email=email,
                 password=password1
             )
-            user.save()
+            auth_user.save()
+            
+            # Also create a User (staff) record
+            User.objects.create(
+                name=username,
+                auth_user=auth_user
+            )
             
             messages.success(request, 'Account created successfully! Please login.')
             return redirect('login')
@@ -96,29 +102,54 @@ def home(request):
 @login_required(login_url='login')
 def record_usage(request):
     """記錄香水使用 - 需要登入"""
+    
+    # 嘗試找到當前登入使用者對應的 User (staff) 記錄
+    try:
+        current_staff_user = User.objects.get(auth_user=request.user)
+    except User.DoesNotExist:
+        # 如果找不到，自動建立一個
+        current_staff_user = User.objects.create(
+            name=request.user.username,
+            auth_user=request.user
+        )
+        messages.info(request, f'Staff profile created for {request.user.username}')
+    
     if request.method == "POST":
         gender = request.POST.get("gender")
         perfume_id = request.POST.get("perfume")
-        user_id = request.POST.get("user")
+
+        # Validate inputs
+        if not perfume_id:
+            messages.error(request, 'Please select a perfume.')
+            return redirect("record_usage")
 
         try:
+            perfume = Perfume.objects.get(id=perfume_id)
+            
+            # 使用當前登入使用者的 User 記錄
             UsageLog.objects.create(
                 gender=gender,
-                perfume_id=perfume_id,
-                user_id=user_id,
+                perfume=perfume,
+                user=current_staff_user,  # 自動使用當前登入使用者
             )
-            messages.success(request, 'Usage recorded successfully!')
+            
+            messages.success(
+                request, 
+                f'Successfully recorded {perfume.brand} - {perfume.name}!'
+            )
+        except Perfume.DoesNotExist:
+            messages.error(request, 'Selected perfume does not exist.')
         except Exception as e:
             messages.error(request, f'Error recording usage: {str(e)}')
 
         return redirect("record_usage")
 
+    # GET request - show form
     perfumes = Perfume.objects.all().order_by("brand", "name")
-    users = User.objects.all()
 
     return render(request, "record_usage.html", {
         "perfumes": perfumes,
-        "users": users,
+        "current_user": current_staff_user,  # 傳遞當前使用者
     })
 
 
@@ -195,13 +226,15 @@ def add_perfume(request):
         name = request.POST.get('name')
         capacity_ml = request.POST.get('capacity_ml')
         description = request.POST.get('description', '')
+        image_url = request.POST.get('image_url', '')
         
         try:
             perfume = Perfume.objects.create(
                 brand=brand,
                 name=name,
                 capacity_ml=capacity_ml,
-                description=description if description else None
+                description=description if description else None,
+                image_url=image_url if image_url else None
             )
             messages.success(request, f'Successfully added {brand} - {name}!')
         except Exception as e:
@@ -221,8 +254,11 @@ def edit_perfume(request, perfume_id):
         perfume.brand = request.POST.get('brand')
         perfume.name = request.POST.get('name')
         perfume.capacity_ml = request.POST.get('capacity_ml')
-        perfume.description = request.POST.get('description', '')
-        perfume.image_url = request.POST.get('image_url', '')
+        description = request.POST.get('description', '')
+        image_url = request.POST.get('image_url', '')
+        
+        perfume.description = description if description else None
+        perfume.image_url = image_url if image_url else None
         
         try:
             perfume.save()

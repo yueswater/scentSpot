@@ -1,8 +1,17 @@
 from django.db import models
+from django.contrib.auth.models import User as AuthUser
 
 
 class User(models.Model):
+    """Staff user for perfume usage tracking"""
     name = models.CharField(max_length=100)
+    auth_user = models.OneToOneField(
+        AuthUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='staff_profile'
+    )
 
     def __str__(self):
         return self.name
@@ -22,16 +31,20 @@ class Perfume(models.Model):
 
 class UsageLog(models.Model):
     GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('U', 'Unspecified'),
+        ("Male", "Male"),
+        ("Female", "Female"),
+        ("Unspecified", "Unspecified"),
     ]
 
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=12, choices=GENDER_CHOICES, default="Unspecified")
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='logs')
-    perfume = models.ForeignKey(Perfume, on_delete=models.CASCADE, related_name='logs')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='logs'
+    )
+    perfume = models.ForeignKey(
+        Perfume, on_delete=models.CASCADE, related_name='logs'
+    )
     used_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"[{self.get_gender_display()}] {self.perfume.name} at {self.used_at}"
+        return f"[{self.gender}] {self.perfume.name} at {self.used_at}"

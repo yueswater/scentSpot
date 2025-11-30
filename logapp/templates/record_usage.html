@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Record Usage{% endblock %}
 
@@ -6,12 +7,13 @@
 
 <div class="w-full py-10">
 
-  <div class="max-w-3xl mx-auto px-4">
+  <div class="max-w-6xl mx-auto px-4">
 
     <h1 class="text-3xl font-bold mb-8">Record Perfume Usage</h1>
 
-    <div class="flex flex-col lg:flex-row gap-12">
+    <div class="flex flex-col lg:flex-row gap-12 items-start">
 
+      <!-- Form Section -->
       <div class="flex-1">
 
         <form method="POST" class="space-y-6">
@@ -19,7 +21,7 @@
 
           <div>
             <label class="label font-semibold">Gender</label>
-            <select name="gender" class="select select-bordered w-full">
+            <select name="gender" class="select select-bordered w-full" required>
               <option value="M">Male</option>
               <option value="F">Female</option>
               <option value="U">Unspecified</option>
@@ -28,33 +30,84 @@
 
           <div>
             <label class="label font-semibold">Perfume</label>
-            <select name="perfume" class="select select-bordered w-full">
+            <select 
+              name="perfume" 
+              id="perfume-select" 
+              class="select select-bordered w-full"
+              required
+            >
+              <option value="">-- Select a perfume --</option>
               {% for p in perfumes %}
-              <option value="{{ p.id }}">{{ p.brand }} - {{ p.name }}</option>
+              <option 
+                value="{{ p.id }}" 
+                data-image="{{ p.image_url|default:'' }}"
+                data-brand="{{ p.brand }}"
+                data-name="{{ p.name }}"
+                data-capacity="{{ p.capacity_ml }}"
+              >
+                {{ p.brand }} - {{ p.name }}
+              </option>
               {% endfor %}
             </select>
           </div>
 
+          <!-- Display current user (read-only) -->
           <div>
             <label class="label font-semibold">Staff</label>
-            <select name="user" class="select select-bordered w-full">
-              {% for u in users %}
-              <option value="{{ u.id }}">{{ u.name }}</option>
-              {% endfor %}
-            </select>
+            <div class="input input-bordered w-full bg-base-200 flex items-center">
+              <i class="fa-solid fa-user mr-2 text-base-content/50"></i>
+              <span class="text-base-content">
+                {% if current_user %}
+                  {{ current_user.name }}
+                {% else %}
+                  {{ user.username }}
+                {% endif %}
+              </span>
+            </div>
           </div>
 
-          <button class="btn btn-primary w-full text-lg">Record</button>
+          <button type="submit" class="btn btn-primary w-full text-lg">
+            <i class="fa-solid fa-check mr-2"></i>
+            Record
+          </button>
 
         </form>
       </div>
 
-      <div class="flex-1 hidden lg:block">
+      <!-- Image Preview Section -->
+      <div class="flex-1">
+        <div class="card bg-base-100 shadow-xl h-full flex flex-col">
+          <figure class="flex-1 px-8 pt-8 flex items-center justify-center">
+            <div 
+              id="perfume-image-container"
+              class="w-full max-w-sm mx-auto flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl aspect-square"
+              data-default-image="{% static 'images/fluffy.png' %}"
+            >
+              <img 
+                id="perfume-image" 
+                src="{% static 'images/fluffy.png' %}" 
+                alt="Mascot"
+                class="rounded-xl w-full h-full object-contain transition-all duration-300"
+              />
+              <div id="image-placeholder" style="display: none;" class="flex flex-col items-center justify-center text-center p-8">
+                <i class="fa-solid fa-image text-6xl text-base-content/20 mb-4"></i>
+                <p class="text-base-content/50">No image available</p>
+              </div>
+            </div>
+          </figure>
+          <div class="card-body items-center text-center flex-none">
+            <h2 id="perfume-title" class="card-title text-2xl">Our Mascot</h2>
+            <p id="perfume-subtitle" class="text-base-content/70">Select a perfume to see its image</p>
+          </div>
+        </div>
       </div>
 
     </div>
 
   </div>
 </div>
+
+<!-- External JavaScript -->
+<script src="{% static 'js/perfume-image-updater.js' %}"></script>
 
 {% endblock %}
